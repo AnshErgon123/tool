@@ -9,7 +9,7 @@ SECRET_TOKEN = os.environ.get("SECRET_TOKEN", "supersecret")
 
 @can_monitor_bp.route("/")
 def home():
-    return "CAN Monitor Home Page"
+    return render_template("home.html")
 
 @can_monitor_bp.route("/can-monitor")
 def can_monitor_home():

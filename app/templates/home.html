@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Home - CAN Monitor{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="jumbotron">
+            <h1 class="display-4">Welcome to CAN Monitor</h1>
+            <p class="lead">A real-time CAN bus monitoring and logging solution.</p>
+            <hr class="my-4">
+            <p>Monitor your CAN bus traffic, log messages, and analyze data in real-time.</p>
+            <a class="btn btn-primary btn-lg" href="/can-monitor" role="button">Go to Monitor</a>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Real-time Monitoring</h5>
+                <p class="card-text">View CAN messages as they arrive in real-time with our intuitive interface.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Data Logging</h5>
+                <p class="card-text">Automatically log all CAN messages for later analysis and debugging.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Easy Export</h5>
+                <p class="card-text">Download your logs in CSV format for further analysis in your preferred tools.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
