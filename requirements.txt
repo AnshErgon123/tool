@@ -1,0 +1,5 @@
+Flask
+flask-socketio
+python-dotenv
+requests
+python-can

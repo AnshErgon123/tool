@@ -1,0 +1,115 @@
+{% extends 'layout.html' %}
+{% block title %}CAN Monitor{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row mb-4">
+    <div class="col text-center">
+      <h2 class="text-primary">CAN Monitor</h2>
+      <p class="text-muted">Live monitoring of CAN bus messages</p>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-3">
+    <div class="col-md-4">
+      <label for="filter-id" class="form-label">Filter by ID</label>
+      <input type="text" class="form-control" id="filter-id" placeholder="e.g. 0x123">
+    </div>
+    <div class="col-md-4">
+      <label for="filter-data" class="form-label">Filter by Data</label>
+      <input type="text" class="form-control" id="filter-data" placeholder="e.g. FF 0A 34">
+    </div>
+    <div class="col-md-4 d-flex align-items-end">
+      <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">Clear Filters</button>
+    </div>
+  </div>
+
+  <div class="table-responsive mb-4">
+    <table class="table table-striped table-bordered align-middle" id="data-table">
+      <thead class="table-dark">
+        <tr>
+          <th scope="col">Timestamp</th>
+          <th scope="col">CAN ID</th>
+          <th scope="col">Data</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- CAN data rows will be added dynamically -->
+      </tbody>
+    </table>
+  </div>
+
+  <div class="row justify-content-between">
+    <div class="col-auto">
+      <a href="/logs/download" class="btn btn-success">Download Logs</a>
+    </div>
+    <div class="col-auto">
+      <span class="badge bg-info" id="heartbeat-status">Heartbeat: Unknown</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  const socket = io();
+
+  const dataTableBody = document.querySelector("#data-table tbody");
+  const filterId = document.getElementById("filter-id");
+  const filterData = document.getElementById("filter-data");
+  const heartbeatStatus = document.getElementById("heartbeat-status");
+
+  const dataList = [];
+
+  function clearFilters() {
+    filterId.value = "";
+    filterData.value = "";
+    renderTable();
+  }
+
+  function renderTable() {
+    const idFilter = filterId.value.toLowerCase().trim();
+    const dataFilter = filterData.value.toLowerCase().trim();
+    dataTableBody.innerHTML = "";
+
+    const filtered = dataList.filter(item => {
+      return (!idFilter || item.id.toLowerCase().includes(idFilter)) &&
+             (!dataFilter || item.data.toLowerCase().includes(dataFilter));
+    });
+
+    for (const item of filtered.slice().reverse()) {
+      const row = document.createElement("tr");
+      row.innerHTML = `<td>${item.timestamp}</td><td>${item.id}</td><td>${item.data}</td>`;
+      dataTableBody.appendChild(row);
+    }
+  }
+
+  socket.on("can_message", (data) => {
+    dataList.push(data);
+    renderTable();
+  });
+
+  socket.on("heartbeat", (data) => {
+    const now = new Date();
+    heartbeatStatus.textContent = `Heartbeat: Online (${now.toLocaleTimeString()})`;
+    heartbeatStatus.className = "badge bg-success";
+  });
+
+  setInterval(() => {
+    const last = heartbeatStatus.textContent.includes("Online");
+    if (!last) return;
+    const ageText = heartbeatStatus.textContent.match(/\(([^)]+)\)/);
+    if (!ageText) return;
+
+    const lastTime = new Date();
+    const now = new Date();
+    const diff = (now - lastTime) / 1000;
+
+    if (diff > 10) {
+      heartbeatStatus.textContent = "Heartbeat: Offline";
+      heartbeatStatus.className = "badge bg-danger";
+    }
+  }, 5000);
+
+  filterId.addEventListener("input", renderTable);
+  filterData.addEventListener("input", renderTable);
+</script>
+{% endblock %}
