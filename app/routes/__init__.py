@@ -17,3 +17,6 @@ def create_app():
 
     socketio.init_app(app)
     return app
+
+# This file can be empty or contain route-specific imports
+# The Flask app initialization has been moved to app/__init__.py
