@@ -1,5 +1,7 @@
-Flask
-flask-socketio
-python-dotenv
-requests
-python-can
+Flask==3.0.2
+flask-socketio==5.3.6
+python-dotenv==1.0.1
+requests==2.31.0
+python-can==4.3.1
+gunicorn==21.2.0
+eventlet==0.35.2
