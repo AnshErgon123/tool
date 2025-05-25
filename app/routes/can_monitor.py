@@ -7,6 +7,10 @@ can_monitor_bp = Blueprint("can_monitor", __name__)
 CSV_FILE = "can_log.csv"
 SECRET_TOKEN = os.environ.get("SECRET_TOKEN", "supersecret")
 
+@can_monitor_bp.route("/")
+def home():
+    return "CAN Monitor Home Page"
+
 @can_monitor_bp.route("/can-monitor")
 def can_monitor_home():
     return render_template("can_monitor.html")

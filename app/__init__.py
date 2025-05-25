@@ -14,4 +14,9 @@ def create_app():
     app.register_blueprint(can_monitor_bp)
 
     socketio.init_app(app)
+
+    @app.route("/")
+    def index():
+        return "Welcome to the CAN Monitor!"
+
     return app
