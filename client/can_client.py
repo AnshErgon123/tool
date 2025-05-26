@@ -7,7 +7,8 @@ from datetime import datetime
 
 load_dotenv()
 
-# Default values if environment variables are not set
+
+# Load from .env or use default values
 SERVER_URL = os.getenv("SERVER_URL", "https://tool-t8tp.onrender.com")
 SECRET_TOKEN = os.getenv("SECRET_TOKEN", "supersecret")
 
@@ -22,16 +23,16 @@ HEADERS = {
 can_interface = 'pcan'
 can_channel = 'PCAN_USBBUS1'
 
-RETRY_DELAY = 5  # seconds
-HEARTBEAT_INTERVAL = 10  # seconds
+RETRY_DELAY = 5         # seconds to wait on failure
+HEARTBEAT_INTERVAL = 10  # seconds between heartbeat pings
 
 def send_heartbeat():
     try:
         res = requests.post(f"{SERVER_URL}/api/heartbeat", headers=HEADERS)
         if res.status_code == 200:
-            print("Heartbeat sent")
+            print("❤️ Heartbeat sent")
         else:
-            print(f"⚠ Heartbeat failed: {res.status_code}")
+            print(f"⚠ Heartbeat failed: {res.status_code} - {res.text}")
     except Exception as e:
         print("❌ Heartbeat error:", e)
 
@@ -39,8 +40,12 @@ def main():
     last_heartbeat = 0
 
     try:
-        bus = can.interface.Bus(channel=can_channel, interface=can_interface)
-        print(f"🚗 Sending CAN messages to: {SERVER_URL}")
+        bus = can.interface.Bus(
+            channel=can_channel,
+            interface=can_interface,
+            receive_own_messages=True  # ✅ Allow receiving messages sent by USB-CAN tool
+        )
+        print(f"🚗 Listening to CAN channel: {can_channel}")
 
         while True:
             current_time = time.time()
@@ -48,7 +53,7 @@ def main():
                 send_heartbeat()
                 last_heartbeat = current_time
 
-            msg = bus.recv(0.1)  # Timeout of 1 sec
+            msg = bus.recv(0.1)  # Timeout of 100ms
 
             if msg:
                 timestamp_str = datetime.fromtimestamp(msg.timestamp).isoformat()
