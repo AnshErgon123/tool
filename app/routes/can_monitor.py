@@ -35,10 +35,17 @@ def receive_data():
 
         data = request.get_json(silent=True) or {}
 
+        # Validate required fields
+        required_fields = ["timestamp", "id", "data"]
+        missing = [field for field in required_fields if field not in data]
+        if missing:
+            print(f"❌ Missing fields in payload: {missing}. Payload: {data}")
+            return jsonify({"error": f"Missing fields: {', '.join(missing)}"}), 400
+
+        # Log received data for debugging
+        print(f"📥 Received CAN data: {data}")
+
         # --- WARNING: Local CSV logging is NOT persistent on platforms like Render.com ---
-        # Data written here will be lost when the container restarts.
-        # For production, consider using a database (PostgreSQL, MongoDB)
-        # or a cloud storage service (AWS S3, Google Cloud Storage) for persistent logging.
         try:
             with open(CSV_FILE, "a", newline="") as f:
                 csv.writer(f).writerow([
@@ -48,17 +55,20 @@ def receive_data():
                 ])
         except IOError as e:
             print(f"⚠️ Warning: Could not write to CSV file: {e}")
-            # Optionally, you could log this to a persistent log service
-            # or handle it differently if CSV writing is critical.
 
         # Emit data to connected WebSocket clients
-        socketio = current_app.extensions['socketio']
-        socketio.emit("can_message", data, broadcast=True)
+        try:
+            socketio = current_app.extensions['socketio']
+            socketio.emit("can_message", data, broadcast=True)
+        except Exception as e:
+            print(f"⚠️ SocketIO emit error: {e}")
 
         return jsonify({"status": "received"}), 200
 
     except Exception as e:
         print("🔥 Error in /api/send_data:", e)
+        import traceback
+        traceback.print_exc()
         return jsonify({"error": "Server error"}), 500
 
 @can_monitor_bp.route("/api/heartbeat", methods=["POST"])

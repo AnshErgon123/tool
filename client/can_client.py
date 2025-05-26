@@ -126,8 +126,15 @@ def main():
                 print(f"❌ Network error: Connection failed to {SERVER_URL}/api/send_data - {e}")
                 time.sleep(RETRY_DELAY)
             except Exception as e:
-                print(f"❌ Unexpected error sending data: {e}")
-                time.sleep(RETRY_DELAY)
+                import traceback
+                print("🔥 Error in /api/send_data:", e)
+                traceback.print_exc()  # This prints the full error to your Render logs
+                return jsonify({"error": "Server error"}), 500
+
+            # Use a Windows-friendly path for the log file
+            log_path = os.path.join(os.getcwd(), "can_log.csv")
+            with open(log_path, 'a') as f:
+                f.write(f"{timestamp_str},{can_id_str},{data_str}\n")  # Log to CSV file
 
         # Small delay to prevent busy-waiting, even if no message is received
         time.sleep(0.01) # Shorter sleep here as bus.recv already has a timeout
