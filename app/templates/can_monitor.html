@@ -111,5 +111,21 @@
 
   filterId.addEventListener("input", renderTable);
   filterData.addEventListener("input", renderTable);
+
+  async function fetchAndDisplayCANData() {
+      const res = await fetch('/api/get_data');
+      const data = await res.json();
+      const tableBody = document.querySelector('table tbody');
+      tableBody.innerHTML = '';
+      data.forEach(msg => {
+          const row = document.createElement('tr');
+          row.innerHTML = `<td>${msg.timestamp}</td><td>${msg.id}</td><td>${msg.data}</td>`;
+          tableBody.appendChild(row);
+      });
+  }
+
+  // Fetch every 2 seconds
+  setInterval(fetchAndDisplayCANData, 2000);
+  fetchAndDisplayCANData();
 </script>
 {% endblock %}

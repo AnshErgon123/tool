@@ -96,6 +96,16 @@ def download_logs():
     # It won't contain historical data if the container has restarted.
     return send_file(CSV_FILE, as_attachment=True, mimetype='text/csv')
 
+@can_monitor_bp.route("/api/get_data", methods=["GET"])
+def get_data():
+    messages = []
+    if os.path.exists(CSV_FILE):
+        with open(CSV_FILE, "r") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                messages.append(row)
+    return jsonify(messages)
+
 # Don't forget to register this blueprint in your main app.py
 # Example in main app.py:
 # from can_monitor import can_monitor_bp
