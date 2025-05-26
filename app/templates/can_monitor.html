@@ -49,6 +49,7 @@
   </div>
 </div>
 
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <script>
   const socket = io();
 
@@ -57,6 +58,7 @@
   const filterData = document.getElementById("filter-data");
   const heartbeatStatus = document.getElementById("heartbeat-status");
 
+   // Store all CAN messages here
   const dataList = [];
 
   function clearFilters() {
@@ -82,6 +84,16 @@
     }
   }
 
+  // Fetch all existing CAN data on page load
+  async function fetchInitialData() {
+    const res = await fetch('/api/get_data');
+    const data = await res.json();
+    dataList.length = 0; // Clear existing
+    dataList.push(...data);
+    renderTable();
+  }
+
+  // Listen for new CAN messages via Socket.IO
   socket.on("can_message", (data) => {
     dataList.push(data);
     renderTable();
@@ -93,39 +105,13 @@
     heartbeatStatus.className = "badge bg-success";
   });
 
-  setInterval(() => {
-    const last = heartbeatStatus.textContent.includes("Online");
-    if (!last) return;
-    const ageText = heartbeatStatus.textContent.match(/\(([^)]+)\)/);
-    if (!ageText) return;
-
-    const lastTime = new Date();
-    const now = new Date();
-    const diff = (now - lastTime) / 1000;
-
-    if (diff > 10) {
-      heartbeatStatus.textContent = "Heartbeat: Offline";
-      heartbeatStatus.className = "badge bg-danger";
-    }
-  }, 5000);
-
   filterId.addEventListener("input", renderTable);
   filterData.addEventListener("input", renderTable);
 
-  async function fetchAndDisplayCANData() {
-      const res = await fetch('/api/get_data');
-      const data = await res.json();
-      const tableBody = document.querySelector('table tbody');
-      tableBody.innerHTML = '';
-      data.forEach(msg => {
-          const row = document.createElement('tr');
-          row.innerHTML = `<td>${msg.timestamp}</td><td>${msg.id}</td><td>${msg.data}</td>`;
-          tableBody.appendChild(row);
-      });
-  }
+  // Initial fetch
+  fetchInitialData();
 
-  // Fetch every 2 seconds
-  setInterval(fetchAndDisplayCANData, 2000);
-  fetchAndDisplayCANData();
+  // Optionally, refresh the full list every 60 seconds in case of missed messages
+  setInterval(fetchInitialData, 60000);
 </script>
 {% endblock %}
