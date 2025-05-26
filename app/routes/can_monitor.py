@@ -103,8 +103,17 @@ def get_data():
         with open(CSV_FILE, "r") as f:
             reader = csv.DictReader(f)
             for row in reader:
+                print(row)  # Debug: See what keys/values are present
                 messages.append(row)
-    return jsonify(messages)
+    # Example response structure
+    return jsonify([
+        {
+            "timestamp": "2024-05-26T12:34:56",
+            "id": "0x123",
+            "data": "11 22 33"
+        },
+        # ... more entries ...
+    ])
 
 # Don't forget to register this blueprint in your main app.py
 # Example in main app.py:
