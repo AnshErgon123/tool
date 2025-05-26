@@ -1,4 +1,3 @@
-# (Your can_client.py content - no changes needed here)
 import os
 import time
 import can
@@ -6,9 +5,13 @@ import requests
 from dotenv import load_dotenv
 from datetime import datetime
 
-load_dotenv() # Loads from .env in the same directory by default
+load_dotenv()
 
-SERVER_URL = os.getenv("SERVER_URL", "https://tool-t8tp.onrender.com")
+# Load from .env or use default values
+# Make sure your .env file in the client directory has these:
+# SERVER_URL=https://your-render-app-name.onrender.com
+# SECRET_TOKEN=supersecret
+SERVER_URL = os.getenv("SERVER_URL", "https://tool-t8tp.onrender.com") # Update with your actual Render URL
 SECRET_TOKEN = os.getenv("SECRET_TOKEN", "supersecret")
 
 print(f"SERVER_URL: {SERVER_URL}")
@@ -19,17 +22,20 @@ HEADERS = {
     "Content-Type": "application/json"
 }
 
+# Configure your CAN interface here.
+# 'pcan' and 'PCAN_USBBUS1' are specific to Peak CAN devices.
+# Adjust these based on your CAN hardware (e.g., 'socketcan' for Linux, 'kvaser', etc.)
 can_interface = 'pcan'
 can_channel = 'PCAN_USBBUS1'
 
-RETRY_DELAY = 5
-HEARTBEAT_INTERVAL = 10
-REQUEST_TIMEOUT = 5
+RETRY_DELAY = 5         # seconds to wait on failure before retrying POST requests
+HEARTBEAT_INTERVAL = 10 # seconds between heartbeat pings to the server
 
 def send_heartbeat():
     try:
         print("Sending heartbeat...")
-        res = requests.post(f"{SERVER_URL}/api/heartbeat", headers=HEADERS, timeout=REQUEST_TIMEOUT)
+        # Note: The heartbeat URL now correctly points to /api/heartbeat
+        res = requests.post(f"{SERVER_URL}/api/heartbeat", headers=HEADERS, timeout=5) # Added timeout
         if res.status_code == 200:
             print("❤️ Heartbeat sent successfully.")
         else:
@@ -43,24 +49,26 @@ def send_heartbeat():
 
 def main():
     last_heartbeat = 0
-    bus = None
+    bus = None # Initialize bus to None
 
+    # Loop to attempt CAN bus connection until successful
     while bus is None:
         try:
             bus = can.interface.Bus(
                 channel=can_channel,
                 interface=can_interface,
-                receive_own_messages=True
+                receive_own_messages=True # ✅ Allow receiving messages sent by USB-CAN tool
             )
             print(f"🚗 Successfully connected to CAN channel: {can_channel}")
         except can.CanError as e:
             print(f"❌ CAN interface error: {e}. Retrying in {RETRY_DELAY} seconds...")
-            bus = None
+            bus = None # Reset bus to None to re-enter loop
             time.sleep(RETRY_DELAY)
         except Exception as e:
             print(f"❌ Unexpected error during CAN connection: {e}. Retrying in {RETRY_DELAY} seconds...")
-            bus = None
+            bus = None # Reset bus to None to re-enter loop
             time.sleep(RETRY_DELAY)
+
 
     while True:
         current_time = time.time()
@@ -70,12 +78,12 @@ def main():
 
         msg = None
         try:
-            msg = bus.recv(0.1)
+            msg = bus.recv(0.1) # Timeout of 100ms
         except can.CanError as e:
             print(f"❌ Error receiving CAN message: {e}. Attempting to re-establish bus connection.")
-            if bus:
-                bus.shutdown()
+            bus.shutdown() # Shut down the problematic bus
             bus = None
+            # Re-attempt connection in the outer while loop
             while bus is None:
                 try:
                     bus = can.interface.Bus(
@@ -90,7 +98,8 @@ def main():
                 except Exception as reconnect_e:
                     print(f"❌ Unexpected error during reconnection: {reconnect_e}. Retrying in {RETRY_DELAY} seconds...")
                     time.sleep(RETRY_DELAY)
-            continue
+            continue # Continue to the next iteration of the main loop to process messages
+
 
         if msg:
             timestamp_str = datetime.fromtimestamp(msg.timestamp).isoformat()
@@ -104,12 +113,12 @@ def main():
             }
 
             try:
-                res = requests.post(f"{SERVER_URL}/api/send_data", json=payload, headers=HEADERS, timeout=REQUEST_TIMEOUT)
+                res = requests.post(f"{SERVER_URL}/api/send_data", json=payload, headers=HEADERS, timeout=5) # Added timeout
                 if res.status_code == 200:
                     print(f"✅ Sent: {payload}")
                 else:
                     print(f"⚠ Failed to send data: {res.status_code} {res.text}")
-                    time.sleep(RETRY_DELAY)
+                    time.sleep(RETRY_DELAY) # Wait before retrying if server returns an error
             except requests.exceptions.Timeout:
                 print(f"❌ Network error: Request timed out for {SERVER_URL}/api/send_data")
                 time.sleep(RETRY_DELAY)
@@ -120,7 +129,8 @@ def main():
                 print(f"❌ Unexpected error sending data: {e}")
                 time.sleep(RETRY_DELAY)
 
-        time.sleep(0.01)
+        # Small delay to prevent busy-waiting, even if no message is received
+        time.sleep(0.01) # Shorter sleep here as bus.recv already has a timeout
 
 if __name__ == "__main__":
     main()
