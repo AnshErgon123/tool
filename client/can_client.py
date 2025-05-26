@@ -133,4 +133,5 @@ def main():
         time.sleep(0.01) # Shorter sleep here as bus.recv already has a timeout
 
 if __name__ == "__main__":
+    print(can.detect_available_configs())
     main()

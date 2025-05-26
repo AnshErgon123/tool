@@ -1,9 +1,8 @@
 import sys
 import os
-from flask import Blueprint, render_template, request, jsonify, send_file
+from flask import Blueprint, render_template, request, jsonify, send_file, current_app
 import csv
 from datetime import datetime
-from app import socketio  # ✅ import the socketio instance
 
 can_monitor_bp = Blueprint("can_monitor", __name__)
 CSV_FILE = "can_log.csv"  # This will be created in the root directory where the app runs
@@ -53,6 +52,7 @@ def receive_data():
             # or handle it differently if CSV writing is critical.
 
         # Emit data to connected WebSocket clients
+        socketio = current_app.extensions['socketio']
         socketio.emit("can_message", data, broadcast=True)
 
         return jsonify({"status": "received"}), 200
