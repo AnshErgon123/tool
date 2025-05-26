@@ -7,8 +7,9 @@ from datetime import datetime
 
 load_dotenv()
 
-SERVER_URL = os.getenv("SERVER_URL")
-SECRET_TOKEN = os.getenv("SECRET_TOKEN")
+# Default values if environment variables are not set
+SERVER_URL = os.getenv("SERVER_URL", "https://tool-t8tp.onrender.com")
+SECRET_TOKEN = os.getenv("SECRET_TOKEN", "supersecret")
 
 print(f"SERVER_URL: {SERVER_URL}")
 print(f"SECRET_TOKEN: {SECRET_TOKEN}")
@@ -38,7 +39,7 @@ def main():
     last_heartbeat = 0
 
     try:
-        bus = can.interface.Bus(channel=can_channel, bustype=can_interface)
+        bus = can.interface.Bus(channel=can_channel, interface=can_interface)
         print(f"🚗 Sending CAN messages to: {SERVER_URL}")
 
         while True:
@@ -78,5 +79,5 @@ def main():
     except Exception as e:
         print("❌ Unexpected error:", e)
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     main()
