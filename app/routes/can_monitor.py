@@ -105,15 +105,7 @@ def get_data():
             for row in reader:
                 print(row)  # Debug: See what keys/values are present
                 messages.append(row)
-    # Example response structure
-    return jsonify([
-        {
-            "timestamp": "2024-05-26T12:34:56",
-            "id": "0x123",
-            "data": "11 22 32"
-        },
-        # ... more entries ...
-    ])
+    return jsonify(messages)
 
 # Don't forget to register this blueprint in your main app.py
 # Example in main app.py:
