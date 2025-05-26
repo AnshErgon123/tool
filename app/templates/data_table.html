@@ -1,0 +1,61 @@
+<!-- Replace the content of your log files page with this -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Table</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 80%;
+      margin: 20px auto;
+    }
+    th, td {
+      border: 1px solid #888;
+      padding: 8px 12px;
+      text-align: left;
+    }
+    th {
+      background: #f0f0f0;
+    }
+    .help-text {
+      width: 80%;
+      margin: 20px auto;
+      font-family: monospace;
+      background: #f9f9f9;
+      padding: 12px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h2 style="text-align:center;">Data Table</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Device Value</th>
+        <th>Project Value</th>
+        <th>Min Value</th>
+        <th>Max Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Brake Input</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Mapped Brake</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Brake Command</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Brake Pedal Enable</td><td></td><td>Off</td><td>Off</td><td>On</td></tr>
+      <tr><td>Brake Min Input</td><td></td><td>15 %</td><td>0 %</td><td>100 %</td></tr>
+      <tr><td>Brake Max Input</td><td></td><td>85 %</td><td>0 %</td><td>100 %</td></tr>
+      <tr><td>Brake Map Shape</td><td></td><td>50 %</td><td>0 %</td><td>100 %</td></tr>
+      <tr><td>Brake Offset</td><td></td><td>0 %</td><td>0 %</td><td>100 %</td></tr>
+      <tr><td>Brake Filter</td><td></td><td>10.0 Hz</td><td>0.5 Hz</td><td>125.0 Hz</td></tr>
+      <tr><td>VCL Brake Enable</td><td></td><td>Off</td><td>Off</td><td>On</td></tr>
+    </tbody>
+  </table>
+  <div class="help-text">
+    Voltage at pot2 wiper (pin 17).<br>
+    <b>Brake_Pot_Percent CAN = 0x33D3:00, Node ID = 0x27</b>
+  </div>
+</body>
+</html>

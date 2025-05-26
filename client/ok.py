@@ -35,3 +35,4 @@ def list_pcan_channels():
 
 if __name__ == "__main__":
     list_pcan_channels()
+
