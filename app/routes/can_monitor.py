@@ -110,7 +110,7 @@ def get_data():
         {
             "timestamp": "2024-05-26T12:34:56",
             "id": "0x123",
-            "data": "11 22 33"
+            "data": "11 22 32"
         },
         # ... more entries ...
     ])
