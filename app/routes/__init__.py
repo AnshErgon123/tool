@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_socketio import SocketIO
-from app.routes import table_view  
+from app.routes import data_table  
 
 
 socketio = SocketIO()
