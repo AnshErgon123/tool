@@ -1,12 +1,12 @@
 import json
 from flask import Blueprint, render_template, current_app
 
-bp = Blueprint('data_table', __name__)
+bp = Blueprint('datatable', __name__)
 
 @bp.route("/datatable")
 def data_table():
     # Construct path relative to app root
-    json_path = current_app.root_path + "/data/table_data.json"
+    json_path = current_app.root_path + "/data/data_table.json"
     with open(json_path, "r") as f:
         table_data = json.load(f)
 
