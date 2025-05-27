@@ -1,5 +1,5 @@
 [
-  { "name": "Brake Input",          "device": "",    "project": "",   "min": "",     "max": ""    },
+  { "name": "Brake_Input",          "device": "",    "project": "",   "min": "",     "max": ""    },
   { "name": "Mapped Brake",         "device": "",    "project": "",   "min": "",     "max": ""    },
   { "name": "Brake Command",        "device": "",    "project": "",   "min": "",     "max": ""    },
   { "name": "Brake Pedal Enable",   "device": "➕",   "project": "Off","min": "Off",  "max": "On"  },

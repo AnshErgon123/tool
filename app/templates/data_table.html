@@ -1,33 +1,81 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+
 {% block content %}
 <h2>Brake Configuration Table</h2>
 
-<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Device Value</th>
-      <th>Project Value</th>
-      <th>Min Value</th>
-      <th>Max Value</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for row in table_data %}
-    <tr>
-      <td>{{ row.name }}</td>
-      <td>{{ row.device }}</td>
-      <td>{{ row.project }}</td>
-      <td>{{ row.min }}</td>
-      <td>{{ row.max }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
+<table id="configTable">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Device Value</th>
+            <th>Project Value</th>
+            <th>Min Value</th>
+            <th>Max Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in table_data %}
+        <tr>
+            <td>{{ row.name }}</td>
+            <td contenteditable="true">{{ row.device }}</td>
+            <td contenteditable="true">{{ row.project }}</td>
+            <td contenteditable="true">{{ row.min }}</td>
+            <td contenteditable="true">{{ row.max }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
 
-<br>
+<button onclick="downloadTable()" class="save-btn">Download Changes</button>
 
-<p><strong>Help Text:</strong><br>
-{{ help_text|safe }}
-</p>
+<p><strong>Help Text:</strong><br>{{ help_text|safe }}</p>
+
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    th, td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+    }
+    td[contenteditable="true"] {
+        background-color: #fdfdff;
+        border: 1px solid #aaa;
+    }
+    .save-btn {
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #5b5bff;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+</style>
+
+<script>
+function downloadTable() {
+    const table = document.getElementById("configTable").getElementsByTagName('tbody')[0];
+    const rows = Array.from(table.rows);
+    const data = rows.map(row => {
+        const cells = row.cells;
+        return {
+            name: cells[0].innerText.trim(),
+            device: cells[1].innerText.trim(),
+            project: cells[2].innerText.trim(),
+            min: cells[3].innerText.trim(),
+            max: cells[4].innerText.trim()
+        };
+    });
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type : 'application/json'});
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'updated_table_data.json';
+    link.click();
+}
+</script>
 {% endblock %}
