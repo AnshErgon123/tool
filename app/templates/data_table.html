@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Brake Configuration Table</h2>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Device Value</th>
+      <th>Project Value</th>
+      <th>Min Value</th>
+      <th>Max Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in table_data %}
+    <tr>
+      <td>{{ row.name }}</td>
+      <td>{{ row.device }}</td>
+      <td>{{ row.project }}</td>
+      <td>{{ row.min }}</td>
+      <td>{{ row.max }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<br>
+
+<p><strong>Help Text:</strong><br>
+{{ help_text|safe }}
+</p>
+{% endblock %}
