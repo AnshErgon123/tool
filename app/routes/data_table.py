@@ -3,7 +3,7 @@ from flask import Blueprint, render_template, current_app
 
 bp = Blueprint('data_table', __name__)
 
-@bp.route("/data-table")
+@bp.route("/datatable")
 def data_table():
     # Construct path relative to app root
     json_path = current_app.root_path + "/data/table_data.json"
