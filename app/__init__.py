@@ -12,6 +12,8 @@ def create_app():
 
     from app.routes.can_monitor import can_monitor_bp
     app.register_blueprint(can_monitor_bp)
+    from app.routes.data_table import bp as data_table_bp
+    app.register_blueprint(data_table_bp)
 
     socketio.init_app(app)
 
