@@ -4,61 +4,115 @@
   <meta charset="UTF-8">
   <title>Brake Input Configuration</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 30px;
-    }
-    h2 {
-      margin-bottom: 20px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 30px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 10px;
-      text-align: center;
-    }
-    th {
-      background-color: #f2f2f2;
-    }
-    .input-cell input[type=number],
-    .input-cell select {
-      width: 80%;
-      padding: 5px;
-    }
-    .disabled-row {
-      background-color: #f9f9f9;
-      color: #888;
-    }
-    .apply-btn {
-      padding: 10px 20px;
-      background-color: #007BFF;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .apply-btn:disabled {
-      background-color: #999;
-      cursor: not-allowed;
-    }
-    .help-text {
-      padding: 10px;
-      background-color: #eef;
-      border-radius: 5px;
-      font-family: monospace;
-    }
-    .error {
-      color: red;
-      font-size: 0.9em;
-    }
-    .invalid {
-      border: 2px solid red;
-    }
-  </style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 30px;
+    background-color: #f8f9fa;
+    color: #212529;
+  }
+
+  h2 {
+    margin-bottom: 25px;
+    font-size: 28px;
+    color: #343a40;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 30px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  th, td {
+    padding: 14px 16px;
+    text-align: center;
+    border-bottom: 1px solid #dee2e6;
+    font-size: 15px;
+  }
+
+  th {
+    background-color: #e9ecef;
+    font-weight: 600;
+    color: #495057;
+  }
+
+  tr:nth-child(even) {
+    background-color: #f8f9fa;
+  }
+
+  tr:hover {
+    background-color: #e2e6ea;
+    transition: background-color 0.3s ease;
+  }
+
+  .input-cell input[type=number],
+  .input-cell select {
+    width: 80%;
+    padding: 6px 8px;
+    font-size: 14px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #212529;
+  }
+
+  .input-cell input[type=number]:focus,
+  .input-cell select:focus {
+    border-color: #80bdff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0,123,255,.25);
+  }
+
+  .disabled-row {
+    background-color: #f1f3f5;
+    color: #6c757d;
+  }
+
+  .error {
+    margin-top: 4px;
+    font-size: 13px;
+    color: #dc3545;
+  }
+
+  .invalid {
+    border: 2px solid #dc3545 !important;
+  }
+
+  .apply-btn {
+    padding: 10px 20px;
+    background-color: #0d6efd;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .apply-btn:hover:not(:disabled) {
+    background-color: #0b5ed7;
+  }
+
+  .apply-btn:disabled {
+    background-color: #adb5bd;
+    cursor: not-allowed;
+  }
+
+  .help-text {
+    padding: 12px 18px;
+    background-color: #e7f3ff;
+    border-left: 4px solid #0d6efd;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 14px;
+    margin-top: 20px;
+  }
+</style>
 </head>
 <body>
 
