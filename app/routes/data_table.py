@@ -49,3 +49,9 @@ def update_table():
     except Exception as e:
         print("Error:", e)
         return jsonify({'status': 'error', 'message': str(e)}), 500
+
+    fetch('/update_table', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(changes)
+    })
