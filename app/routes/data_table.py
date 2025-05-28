@@ -24,7 +24,7 @@ def data_table():
 def save_table_json():
     data = request.get_json()
     changes = data.get('changes', [])
-    json_path = os.path.join(os.path.dirname(__file__), 'table_data.json')
+    json_path = os.path.join(os.path.dirname(__file__), 'data', 'table_data.json')
     try:
         with open(json_path, 'w') as f:
             json.dump(changes, f, indent=2)
