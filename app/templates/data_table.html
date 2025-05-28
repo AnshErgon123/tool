@@ -125,7 +125,7 @@
 
 <h2>Brake Input Configuration</h2>
 
-<table id="your-table-id">
+<table>
   <thead>
     <tr>
       <th>Name</th>
@@ -219,35 +219,6 @@
     console.log("Updated Project Values:", changes);
     alert("Valid changes captured in console. Backend integration pending.");
   }
-
-  function getTableData() {
-    // Example: Collect data from table rows and cells
-    let table = document.getElementById('your-table-id'); // Replace with your table's ID
-    let data = [];
-    for (let row of table.rows) {
-        let rowData = [];
-        for (let cell of row.cells) {
-            // If cells are editable inputs, get value; else, get textContent
-            let input = cell.querySelector('input');
-            rowData.push(input ? input.value : cell.textContent);
-        }
-        data.push(rowData);
-    }
-    return data;
-}
-
-document.getElementById('apply-change-btn').addEventListener('click', function() {
-    let tableData = getTableData();
-    fetch('/datatable/update', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({table_data: tableData})
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert(data.message);
-    });
-});
 
   // Validate on load
   window.onload = validateInputs;
