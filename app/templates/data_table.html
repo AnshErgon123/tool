@@ -24,8 +24,7 @@
     th {
       background-color: #f2f2f2;
     }
-    .input-cell input[type=number],
-    .input-cell select {
+    .input-cell input[type=number], .input-cell select {
       width: 80%;
       padding: 5px;
     }
@@ -41,22 +40,11 @@
       border-radius: 5px;
       cursor: pointer;
     }
-    .apply-btn:disabled {
-      background-color: #999;
-      cursor: not-allowed;
-    }
     .help-text {
       padding: 10px;
       background-color: #eef;
       border-radius: 5px;
       font-family: monospace;
-    }
-    .error {
-      color: red;
-      font-size: 0.9em;
-    }
-    .invalid {
-      border: 2px solid red;
     }
   </style>
 </head>
@@ -81,25 +69,23 @@
       <td>{{ row.device }}</td>
       <td class="input-cell">
         {% if row.min == "Off" and row.max == "On" %}
-          <select name="project_value" onchange="validateInputs()">
+          <select name="project_value">
             <option value="Off" {% if row.project == "Off" %}selected{% endif %}>Off</option>
             <option value="On" {% if row.project == "On" %}selected{% endif %}>On</option>
           </select>
         {% elif row.min.endswith('%') or row.max.endswith('%') %}
           <input type="number"
-                 data-min="{{ row.min | replace('%', '') }}"
-                 data-max="{{ row.max | replace('%', '') }}"
                  value="{{ row.project | replace('%', '') }}"
-                 oninput="validateInputs()"> %
-          <div class="error"></div>
+                 min="{{ row.min | replace('%', '') }}"
+                 max="{{ row.max | replace('%', '') }}">
+          %
         {% elif row.min.endswith('Hz') or row.max.endswith('Hz') %}
           <input type="number"
-                 data-min="{{ row.min | replace('Hz', '') }}"
-                 data-max="{{ row.max | replace('Hz', '') }}"
                  value="{{ row.project | replace('Hz', '') }}"
-                 step="0.1"
-                 oninput="validateInputs()"> Hz
-          <div class="error"></div>
+                 min="{{ row.min | replace('Hz', '') }}"
+                 max="{{ row.max | replace('Hz', '') }}"
+                 step="0.1">
+          Hz
         {% else %}
           {{ row.project }}
         {% endif %}
@@ -111,36 +97,13 @@
   </tbody>
 </table>
 
-<button class="apply-btn" id="applyBtn" onclick="applyChanges()">Apply Changes</button>
+<button class="apply-btn" onclick="applyChanges()">Apply Changes</button>
 
 <div class="help-text">
   {{ help_text | safe }}
 </div>
 
 <script>
-  function validateInputs() {
-    const inputs = document.querySelectorAll("input[type=number]");
-    let allValid = true;
-
-    inputs.forEach(input => {
-      const min = parseFloat(input.dataset.min);
-      const max = parseFloat(input.dataset.max);
-      const value = parseFloat(input.value);
-      const errorDiv = input.parentElement.querySelector('.error');
-
-      if (isNaN(value) || value < min || value > max) {
-        input.classList.add("invalid");
-        errorDiv.textContent = `Value must be between ${min} and ${max}`;
-        allValid = false;
-      } else {
-        input.classList.remove("invalid");
-        errorDiv.textContent = "";
-      }
-    });
-
-    document.getElementById("applyBtn").disabled = !allValid;
-  }
-
   function applyChanges() {
     const rows = document.querySelectorAll("table tbody tr");
     const changes = [];
@@ -156,11 +119,8 @@
     });
 
     console.log("Updated Project Values:", changes);
-    alert("Valid changes captured in console. Backend integration pending.");
+    alert("Changes captured in console. Add backend logic to save if needed.");
   }
-
-  // Validate on load
-  window.onload = validateInputs;
 </script>
 
 </body>
