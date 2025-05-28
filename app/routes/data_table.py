@@ -1,6 +1,6 @@
+from flask import Blueprint, render_template, current_app, request, jsonify, Flask
 import json
 import os
-from flask import Blueprint, render_template, current_app, request, jsonify, Flask
 
 app = Flask(__name__)
 
@@ -40,8 +40,12 @@ def save_table_json():
 
 @app.route('/update_table', methods=['POST'])
 def update_table():
-    data = request.json
-    # Save to your JSON file (replace 'your_data.json' with your actual file)
-    with open('your_data.json', 'w') as f:
-        json.dump(data, f, indent=2)
-    return jsonify({'status': 'success'})
+    data = request.get_json()
+    try:
+        # Save to your JSON file (change the filename as needed)
+        with open('data_table.json', 'w') as f:
+            json.dump(data, f, indent=2)
+        return jsonify({'status': 'success'})
+    except Exception as e:
+        print("Error:", e)
+        return jsonify({'status': 'error', 'message': str(e)}), 500
