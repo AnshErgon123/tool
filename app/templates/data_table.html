@@ -81,7 +81,7 @@
       <td>{{ row.device }}</td>
       <td class="input-cell">
         {% if row.min == "Off" and row.max == "On" %}
-          <select name="project_value" onchange="validateInputs()">
+          <select onchange="validateInputs()">
             <option value="Off" {% if row.project == "Off" %}selected{% endif %}>Off</option>
             <option value="On" {% if row.project == "On" %}selected{% endif %}>On</option>
           </select>
@@ -141,25 +141,45 @@
     document.getElementById("applyBtn").disabled = !allValid;
   }
 
-  function applyChanges() {
+  async function applyChanges() {
     const rows = document.querySelectorAll("table tbody tr");
     const changes = [];
 
     rows.forEach(row => {
       const name = row.querySelector("td:first-child").innerText.trim();
       const input = row.querySelector("input, select");
-      const value = input ? input.value : null;
+      if (!input) return;
 
-      if (value !== null) {
-        changes.push({ name, updated_project_value: value });
+      let value = input.value;
+      const text = input.parentElement.innerText;
+
+      if (text.includes('%')) {
+        value += '%';
+      } else if (text.includes('Hz')) {
+        value += 'Hz';
       }
+
+      changes.push({ name, project: value });
     });
 
-    console.log("Updated Project Values:", changes);
-    alert("Valid changes captured in console. Backend integration pending.");
+    try {
+      const response = await fetch(window.location.pathname + "/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(changes)
+      });
+      const result = await response.json();
+      if (result.success) {
+        alert("Changes saved successfully.");
+      } else {
+        alert("Error saving changes: " + result.error);
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      alert("Unexpected error. Check console.");
+    }
   }
 
-  // Validate on load
   window.onload = validateInputs;
 </script>
 
