@@ -12,49 +12,51 @@
   }
 
   h2 {
-    margin-bottom: 25px;
-    font-size: 28px;
+    margin-bottom: 20px;
+    font-size: 24px;
     color: #343a40;
+    text-align: center;
   }
 
   table {
-    width: 100%;
+    width: 90%;
+    max-width: 900px;
+    margin: 0 auto 20px auto;
     border-collapse: separate;
     border-spacing: 0;
-    margin-bottom: 30px;
     background-color: #ffffff;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.03);
   }
 
   th, td {
-    padding: 14px 16px;
+    padding: 10px 12px;
     text-align: center;
     border-bottom: 1px solid #dee2e6;
-    font-size: 15px;
+    font-size: 14px;
   }
 
   th {
-    background-color: #e9ecef;
+    background-color: #f1f3f5;
     font-weight: 600;
     color: #495057;
   }
 
   tr:nth-child(even) {
-    background-color: #f8f9fa;
+    background-color: #fafbfc;
   }
 
   tr:hover {
-    background-color: #e2e6ea;
+    background-color: #f1f3f5;
     transition: background-color 0.3s ease;
   }
 
   .input-cell input[type=number],
   .input-cell select {
-    width: 80%;
-    padding: 6px 8px;
-    font-size: 14px;
+    width: 90%;
+    padding: 4px 6px;
+    font-size: 13px;
     border: 1px solid #ced4da;
     border-radius: 4px;
     background-color: #fff;
@@ -65,17 +67,17 @@
   .input-cell select:focus {
     border-color: #80bdff;
     outline: none;
-    box-shadow: 0 0 0 2px rgba(0,123,255,.25);
+    box-shadow: 0 0 0 1px rgba(0,123,255,.25);
   }
 
   .disabled-row {
-    background-color: #f1f3f5;
+    background-color: #f5f6f7;
     color: #6c757d;
   }
 
   .error {
-    margin-top: 4px;
-    font-size: 13px;
+    margin-top: 3px;
+    font-size: 12px;
     color: #dc3545;
   }
 
@@ -84,10 +86,12 @@
   }
 
   .apply-btn {
-    padding: 10px 20px;
+    display: block;
+    margin: 0 auto;
+    padding: 8px 16px;
     background-color: #0d6efd;
     color: white;
-    font-size: 16px;
+    font-size: 14px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
@@ -104,15 +108,18 @@
   }
 
   .help-text {
-    padding: 12px 18px;
+    width: 90%;
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 12px 16px;
     background-color: #e7f3ff;
     border-left: 4px solid #0d6efd;
     border-radius: 6px;
     font-family: monospace;
-    font-size: 14px;
-    margin-top: 20px;
+    font-size: 13px;
   }
 </style>
+
 </head>
 <body>
 
@@ -195,23 +202,38 @@
     document.getElementById("applyBtn").disabled = !allValid;
   }
 
-  function applyChanges() {
-    const rows = document.querySelectorAll("table tbody tr");
-    const changes = [];
+ function applyChanges() {
+  const rows = document.querySelectorAll("table tbody tr");
+  const changes = [];
 
-    rows.forEach(row => {
-      const name = row.querySelector("td:first-child").innerText.trim();
-      const input = row.querySelector("input, select");
-      const value = input ? input.value : null;
+  rows.forEach(row => {
+    const name = row.querySelector("td:first-child").innerText.trim();
+    const input = row.querySelector("input, select");
+    const value = input ? input.value : null;
 
-      if (value !== null) {
-        changes.push({ name, updated_project_value: value });
-      }
-    });
+    if (value !== null) {
+      changes.push({ name, updated_project_value: value });
+    }
+  });
 
-    console.log("Updated Project Values:", changes);
-    alert("Valid changes captured in console. Backend integration pending.");
-  }
+  fetch("/apply_changes", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ changes }),
+  })
+  .then(response => response.json())
+  .then(data => {
+    alert(data.message || "Changes applied successfully.");
+    console.log(data);
+  })
+  .catch(error => {
+    console.error("Error applying changes:", error);
+    alert("Failed to apply changes.");
+  });
+}
+
 
   // Validate on load
   window.onload = validateInputs;
