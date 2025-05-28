@@ -26,6 +26,9 @@ def save_table_json():
     changes = data.get('changes', [])
     json_path = os.path.join(os.path.dirname(__file__), 'data', 'table_data.json')
     try:
+        # Ensure the directory exists
+        os.makedirs(os.path.dirname(json_path), exist_ok=True)
+        # Write the changes to the JSON file
         with open(json_path, 'w') as f:
             json.dump(changes, f, indent=2)
         return jsonify({'success': True})
