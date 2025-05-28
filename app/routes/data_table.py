@@ -1,13 +1,8 @@
 import json
 from flask import Blueprint, render_template, current_app
-from flask import Flask
-from data_table import bp as datatable_bp  # Update 'your_module' as needed
-
-app = Flask(__name__)
-
-app.register_blueprint(datatable_bp)
 
 bp = Blueprint('datatable', __name__)
+
 @bp.route("/datatable")
 def data_table():
     # Construct path relative to app root
