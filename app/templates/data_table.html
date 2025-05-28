@@ -1,110 +1,167 @@
-<style>
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 30px;
-    background-color: #f8f9fa;
-    color: #212529;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Brake Input Configuration</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .input-cell input[type=number],
+    .input-cell select {
+      width: 80%;
+      padding: 5px;
+    }
+    .disabled-row {
+      background-color: #f9f9f9;
+      color: #888;
+    }
+    .apply-btn {
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .apply-btn:disabled {
+      background-color: #999;
+      cursor: not-allowed;
+    }
+    .help-text {
+      padding: 10px;
+      background-color: #eef;
+      border-radius: 5px;
+      font-family: monospace;
+    }
+    .error {
+      color: red;
+      font-size: 0.9em;
+    }
+    .invalid {
+      border: 2px solid red;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Brake Input Configuration</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Device Value</th>
+      <th>Project Value</th>
+      <th>Min Value</th>
+      <th>Max Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in table_data %}
+    <tr class="{{ 'disabled-row' if row.min == '' and row.max == '' }}">
+      <td><strong>{{ row.name }}</strong></td>
+      <td>{{ row.device }}</td>
+      <td class="input-cell">
+        {% if row.min == "Off" and row.max == "On" %}
+          <select name="project_value" onchange="validateInputs()">
+            <option value="Off" {% if row.project == "Off" %}selected{% endif %}>Off</option>
+            <option value="On" {% if row.project == "On" %}selected{% endif %}>On</option>
+          </select>
+        {% elif row.min.endswith('%') or row.max.endswith('%') %}
+          <input type="number"
+                 data-min="{{ row.min | replace('%', '') }}"
+                 data-max="{{ row.max | replace('%', '') }}"
+                 value="{{ row.project | replace('%', '') }}"
+                 oninput="validateInputs()"> %
+          <div class="error"></div>
+        {% elif row.min.endswith('Hz') or row.max.endswith('Hz') %}
+          <input type="number"
+                 data-min="{{ row.min | replace('Hz', '') }}"
+                 data-max="{{ row.max | replace('Hz', '') }}"
+                 value="{{ row.project | replace('Hz', '') }}"
+                 step="0.1"
+                 oninput="validateInputs()"> Hz
+          <div class="error"></div>
+        {% else %}
+          {{ row.project }}
+        {% endif %}
+      </td>
+      <td>{{ row.min }}</td>
+      <td>{{ row.max }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<button class="apply-btn" id="applyBtn" onclick="applyChanges()">Apply Changes</button>
+
+<div class="help-text">
+  {{ help_text | safe }}
+</div>
+
+<script>
+  function validateInputs() {
+    const inputs = document.querySelectorAll("input[type=number]");
+    let allValid = true;
+
+    inputs.forEach(input => {
+      const min = parseFloat(input.dataset.min);
+      const max = parseFloat(input.dataset.max);
+      const value = parseFloat(input.value);
+      const errorDiv = input.parentElement.querySelector('.error');
+
+      if (isNaN(value) || value < min || value > max) {
+        input.classList.add("invalid");
+        errorDiv.textContent = `Value must be between ${min} and ${max}`;
+        allValid = false;
+      } else {
+        input.classList.remove("invalid");
+        errorDiv.textContent = "";
+      }
+    });
+
+    document.getElementById("applyBtn").disabled = !allValid;
   }
 
-  h2 {
-    margin-bottom: 25px;
-    font-size: 28px;
-    color: #343a40;
+  function applyChanges() {
+    const rows = document.querySelectorAll("table tbody tr");
+    const changes = [];
+
+    rows.forEach(row => {
+      const name = row.querySelector("td:first-child").innerText.trim();
+      const input = row.querySelector("input, select");
+      const value = input ? input.value : null;
+
+      if (value !== null) {
+        changes.push({ name, updated_project_value: value });
+      }
+    });
+
+    console.log("Updated Project Values:", changes);
+    alert("Valid changes captured in console. Backend integration pending.");
   }
 
-  table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    margin-bottom: 30px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  }
+  // Validate on load
+  window.onload = validateInputs;
+</script>
 
-  th, td {
-    padding: 14px 16px;
-    text-align: center;
-    border-bottom: 1px solid #dee2e6;
-    font-size: 15px;
-  }
-
-  th {
-    background-color: #e9ecef;
-    font-weight: 600;
-    color: #495057;
-  }
-
-  tr:nth-child(even) {
-    background-color: #f8f9fa;
-  }
-
-  tr:hover {
-    background-color: #e2e6ea;
-    transition: background-color 0.3s ease;
-  }
-
-  .input-cell input[type=number],
-  .input-cell select {
-    width: 80%;
-    padding: 6px 8px;
-    font-size: 14px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    background-color: #fff;
-    color: #212529;
-  }
-
-  .input-cell input[type=number]:focus,
-  .input-cell select:focus {
-    border-color: #80bdff;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(0,123,255,.25);
-  }
-
-  .disabled-row {
-    background-color: #f1f3f5;
-    color: #6c757d;
-  }
-
-  .error {
-    margin-top: 4px;
-    font-size: 13px;
-    color: #dc3545;
-  }
-
-  .invalid {
-    border: 2px solid #dc3545 !important;
-  }
-
-  .apply-btn {
-    padding: 10px 20px;
-    background-color: #0d6efd;
-    color: white;
-    font-size: 16px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-
-  .apply-btn:hover:not(:disabled) {
-    background-color: #0b5ed7;
-  }
-
-  .apply-btn:disabled {
-    background-color: #adb5bd;
-    cursor: not-allowed;
-  }
-
-  .help-text {
-    padding: 12px 18px;
-    background-color: #e7f3ff;
-    border-left: 4px solid #0d6efd;
-    border-radius: 6px;
-    font-family: monospace;
-    font-size: 14px;
-    margin-top: 20px;
-  }
-</style>
+</body>
+</html>
