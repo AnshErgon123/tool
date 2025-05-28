@@ -1,81 +1,167 @@
-{% extends 'base.html' %}
-
-{% block content %}
-<h2>Brake Configuration Table</h2>
-
-<table id="configTable">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Data Value</th>
-            <th>Project Value</th>
-            <th>Min Value</th>
-            <th>Max Value</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for row in table_data %}
-        <tr>
-            <td>{{ row.name }}</td>
-            <td contenteditable="true">{{ row.device }}</td>
-            <td contenteditable="true">{{ row.project }}</td>
-            <td contenteditable="true">{{ row.min }}</td>
-            <td contenteditable="true">{{ row.max }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<button onclick="downloadTable()" class="save-btn">Download Changes</button>
-
-<p><strong>Help Text:</strong><br>{{ help_text|safe }}</p>
-
-<style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Brake Input Configuration</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
     table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
     }
     th, td {
-        border: 1px solid #ccc;
-        padding: 8px;
-        text-align: left;
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
     }
-    td[contenteditable="true"] {
-        background-color: #fdfdff;
-        border: 1px solid #aaa;
+    th {
+      background-color: #f2f2f2;
     }
-    .save-btn {
-        margin-top: 20px;
-        padding: 10px 20px;
-        background-color: #5b5bff;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
+    .input-cell input[type=number],
+    .input-cell select {
+      width: 80%;
+      padding: 5px;
     }
-</style>
+    .disabled-row {
+      background-color: #f9f9f9;
+      color: #888;
+    }
+    .apply-btn {
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .apply-btn:disabled {
+      background-color: #999;
+      cursor: not-allowed;
+    }
+    .help-text {
+      padding: 10px;
+      background-color: #eef;
+      border-radius: 5px;
+      font-family: monospace;
+    }
+    .error {
+      color: red;
+      font-size: 0.9em;
+    }
+    .invalid {
+      border: 2px solid red;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Brake Input Configuration</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Device Value</th>
+      <th>Project Value</th>
+      <th>Min Value</th>
+      <th>Max Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in table_data %}
+    <tr class="{{ 'disabled-row' if row.min == '' and row.max == '' }}">
+      <td><strong>{{ row.name }}</strong></td>
+      <td>{{ row.device }}</td>
+      <td class="input-cell">
+        {% if row.min == "Off" and row.max == "On" %}
+          <select name="project_value" onchange="validateInputs()">
+            <option value="Off" {% if row.project == "Off" %}selected{% endif %}>Off</option>
+            <option value="On" {% if row.project == "On" %}selected{% endif %}>On</option>
+          </select>
+        {% elif row.min.endswith('%') or row.max.endswith('%') %}
+          <input type="number"
+                 data-min="{{ row.min | replace('%', '') }}"
+                 data-max="{{ row.max | replace('%', '') }}"
+                 value="{{ row.project | replace('%', '') }}"
+                 oninput="validateInputs()"> %
+          <div class="error"></div>
+        {% elif row.min.endswith('Hz') or row.max.endswith('Hz') %}
+          <input type="number"
+                 data-min="{{ row.min | replace('Hz', '') }}"
+                 data-max="{{ row.max | replace('Hz', '') }}"
+                 value="{{ row.project | replace('Hz', '') }}"
+                 step="0.1"
+                 oninput="validateInputs()"> Hz
+          <div class="error"></div>
+        {% else %}
+          {{ row.project }}
+        {% endif %}
+      </td>
+      <td>{{ row.min }}</td>
+      <td>{{ row.max }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<button class="apply-btn" id="applyBtn" onclick="applyChanges()">Apply Changes</button>
+
+<div class="help-text">
+  {{ help_text | safe }}
+</div>
 
 <script>
-function downloadTable() {
-    const table = document.getElementById("configTable").getElementsByTagName('tbody')[0];
-    const rows = Array.from(table.rows);
-    const data = rows.map(row => {
-        const cells = row.cells;
-        return {
-            name: cells[0].innerText.trim(),
-            device: cells[1].innerText.trim(),
-            project: cells[2].innerText.trim(),
-            min: cells[3].innerText.trim(),
-            max: cells[4].innerText.trim()
-        };
+  function validateInputs() {
+    const inputs = document.querySelectorAll("input[type=number]");
+    let allValid = true;
+
+    inputs.forEach(input => {
+      const min = parseFloat(input.dataset.min);
+      const max = parseFloat(input.dataset.max);
+      const value = parseFloat(input.value);
+      const errorDiv = input.parentElement.querySelector('.error');
+
+      if (isNaN(value) || value < min || value > max) {
+        input.classList.add("invalid");
+        errorDiv.textContent = `Value must be between ${min} and ${max}`;
+        allValid = false;
+      } else {
+        input.classList.remove("invalid");
+        errorDiv.textContent = "";
+      }
     });
 
-    const blob = new Blob([JSON.stringify(data, null, 2)], {type : 'application/json'});
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'updated_table_data.json';
-    link.click();
-}
+    document.getElementById("applyBtn").disabled = !allValid;
+  }
+
+  function applyChanges() {
+    const rows = document.querySelectorAll("table tbody tr");
+    const changes = [];
+
+    rows.forEach(row => {
+      const name = row.querySelector("td:first-child").innerText.trim();
+      const input = row.querySelector("input, select");
+      const value = input ? input.value : null;
+
+      if (value !== null) {
+        changes.push({ name, updated_project_value: value });
+      }
+    });
+
+    console.log("Updated Project Values:", changes);
+    alert("Valid changes captured in console. Backend integration pending.");
+  }
+
+  // Validate on load
+  window.onload = validateInputs;
 </script>
-{% endblock %}
+
+</body>
+</html>
