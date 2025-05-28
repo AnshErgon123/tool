@@ -1,5 +1,6 @@
 import json
 from flask import Blueprint, render_template, current_app, request, jsonify
+import can  # Add this import
 
 bp = Blueprint('datatable', __name__)
 @bp.route("/datatable")
@@ -38,6 +39,25 @@ def apply_changes():
     with open(json_path, "w") as f:
         json.dump(table_data, f, indent=2)
 
-    # TODO: Send updated values to CAN bus here if needed
+    # --- CAN bus integration ---
+    try:
+        # Example: open CAN bus (adapt channel and bustype as needed)
+        bus = can.interface.Bus(channel='can0', bustype='socketcan')  # or 'pcan', 'usb2can', etc.
+
+        for row in table_data:
+            # Example: Only send rows with a specific CAN mapping
+            if row["name"] == "Brake_Pot_Percent":
+                # Example: CAN ID and data formatting (adapt as needed)
+                can_id = 0x33D3
+                # Convert value to int or appropriate format
+                value = int(float(row["project"]))
+                data = [value & 0xFF]  # Example: 1 byte, adapt for your protocol
+
+                msg = can.Message(arbitration_id=can_id, data=data, is_extended_id=False)
+                bus.send(msg)
+        bus.shutdown()
+    except Exception as e:
+        print("CAN bus send error:", e)
+        return jsonify({"success": False, "error": str(e)}), 500
 
     return jsonify({"success": True})
