@@ -39,7 +39,7 @@ def apply_changes():
     with open(json_path, "w") as f:
         json.dump(table_data, f, indent=2)
 
-    # --- CAN bus integration ---
+    # --- CAN bus integration ---  
     try:
         # Example: open CAN bus (adapt channel and bustype as needed)
         bus = can.interface.Bus(channel='can0', bustype='socketcan')  # or 'pcan', 'usb2can', etc.
