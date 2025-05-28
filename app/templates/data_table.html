@@ -216,8 +216,23 @@
       }
     });
 
-    console.log("Updated Project Values:", changes);
-    alert("Valid changes captured in console. Backend integration pending.");
+    // Send changes to backend
+    fetch('/save_table_json', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ changes })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert("Changes saved to JSON file!");
+      } else {
+        alert("Failed to save changes.");
+      }
+    })
+    .catch(() => alert("Error communicating with backend."));
   }
 
   // Validate on load
