@@ -202,38 +202,23 @@
     document.getElementById("applyBtn").disabled = !allValid;
   }
 
- function applyChanges() {
-  const rows = document.querySelectorAll("table tbody tr");
-  const changes = [];
+  function applyChanges() {
+    const rows = document.querySelectorAll("table tbody tr");
+    const changes = [];
 
-  rows.forEach(row => {
-    const name = row.querySelector("td:first-child").innerText.trim();
-    const input = row.querySelector("input, select");
-    const value = input ? input.value : null;
+    rows.forEach(row => {
+      const name = row.querySelector("td:first-child").innerText.trim();
+      const input = row.querySelector("input, select");
+      const value = input ? input.value : null;
 
-    if (value !== null) {
-      changes.push({ name, updated_project_value: value });
-    }
-  });
+      if (value !== null) {
+        changes.push({ name, updated_project_value: value });
+      }
+    });
 
-  fetch("/apply_changes", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ changes }),
-  })
-  .then(response => response.json())
-  .then(data => {
-    alert(data.message || "Changes applied successfully.");
-    console.log(data);
-  })
-  .catch(error => {
-    console.error("Error applying changes:", error);
-    alert("Failed to apply changes.");
-  });
-}
-
+    console.log("Updated Project Values:", changes);
+    alert("Valid changes captured in console. Backend integration pending.");
+  }
 
   // Validate on load
   window.onload = validateInputs;
