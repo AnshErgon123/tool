@@ -24,12 +24,18 @@ def data_table():
 def save_table_json():
     data = request.get_json()
     changes = data.get('changes', [])
-    json_path = os.path.join(os.path.dirname(__file__), 'data', 'data_table.json')
+    
+    json_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'table_data.json')
+    json_path = os.path.abspath(json_path)
+
+    print(f"[DEBUG] Saving to: {json_path}")
+    print(f"[DEBUG] Received data: {json.dumps(changes, indent=2)}")
+
     try:
         os.makedirs(os.path.dirname(json_path), exist_ok=True)
         with open(json_path, 'w') as f:
             json.dump(changes, f, indent=2)
         return jsonify({'success': True})
     except Exception as e:
-        print("Error saving JSON:", e)
+        print("[ERROR]", e)
         return jsonify({'success': False}), 500
