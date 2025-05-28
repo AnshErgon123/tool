@@ -202,18 +202,20 @@
     document.getElementById("applyBtn").disabled = !allValid;
   }
 
-  function applyChanges() {
+function applyChanges() {
   const rows = document.querySelectorAll("table tbody tr");
   const changes = [];
 
   rows.forEach(row => {
-    const name = row.querySelector("td:first-child").innerText.trim();
+    const columns = row.querySelectorAll("td");
+    const name = columns[0].innerText.trim();
+    const device = columns[1].innerText.trim();
     const input = row.querySelector("input, select");
-    const value = input ? input.value : null;
+    const value = input ? input.value : columns[2].innerText.trim();
+    const min = columns[3].innerText.trim();
+    const max = columns[4].innerText.trim();
 
-    if (value !== null) {
-      changes.push({ name, updated_project_value: value });
-    }
+    changes.push({ name, device, project: value, min, max });
   });
 
   fetch('/update_table', {
@@ -231,6 +233,7 @@
   })
   .catch(() => alert('Error saving changes.'));
 }
+
 
   // Validate on load
   window.onload = validateInputs;

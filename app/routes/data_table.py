@@ -40,18 +40,25 @@ def save_table_json():
 
 @app.route('/update_table', methods=['POST'])
 def update_table():
-    data = request.get_json()
+    updates = request.get_json()
+    json_path = os.path.join(current_app.root_path, 'data', 'data_table.json')
+
     try:
-        # Save to your JSON file (change the filename as needed)
-        with open('data_table.json', 'w') as f:
-            json.dump(data, f, indent=2)
+        # Load the existing data
+        with open(json_path, 'r') as f:
+            table_data = json.load(f)
+
+        # Apply updates
+        update_dict = {item['name']: item['project'] for item in updates}
+        for row in table_data:
+            if row['name'] in update_dict:
+                row['project'] = update_dict[row['name']]
+
+        # Save updated data
+        with open(json_path, 'w') as f:
+            json.dump(table_data, f, indent=2)
+
         return jsonify({'status': 'success'})
     except Exception as e:
         print("Error:", e)
         return jsonify({'status': 'error', 'message': str(e)}), 500
-
-    fetch('/update_table', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(changes)
-    })
