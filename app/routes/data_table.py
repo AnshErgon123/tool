@@ -41,17 +41,15 @@ def apply_changes():
 
     # --- CAN bus integration ---  
     try:
-        # Example: open CAN bus (adapt channel and bustype as needed)
-        bus = can.interface.Bus(channel='can0', bustype='socketcan')  # or 'pcan', 'usb2can', etc.
+        # Use PEAK CAN (PCAN) interface
+        bus = can.interface.Bus(channel='PCAN_USB', bustype='pcan')  # Use 'PCAN_USB' or your specific channel
 
         for row in table_data:
             # Example: Only send rows with a specific CAN mapping
             if row["name"] == "Brake_Pot_Percent":
-                # Example: CAN ID and data formatting (adapt as needed)
                 can_id = 0x33D3
-                # Convert value to int or appropriate format
                 value = int(float(row["project"]))
-                data = [value & 0xFF]  # Example: 1 byte, adapt for your protocol
+                data = [value & 0xFF]  # 1 byte, adapt as needed
 
                 msg = can.Message(arbitration_id=can_id, data=data, is_extended_id=False)
                 bus.send(msg)
