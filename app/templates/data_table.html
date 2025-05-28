@@ -203,22 +203,34 @@
   }
 
   function applyChanges() {
-    const rows = document.querySelectorAll("table tbody tr");
-    const changes = [];
+  const rows = document.querySelectorAll("table tbody tr");
+  const changes = [];
 
-    rows.forEach(row => {
-      const name = row.querySelector("td:first-child").innerText.trim();
-      const input = row.querySelector("input, select");
-      const value = input ? input.value : null;
+  rows.forEach(row => {
+    const name = row.querySelector("td:first-child").innerText.trim();
+    const input = row.querySelector("input, select");
+    const value = input ? input.value : null;
 
-      if (value !== null) {
-        changes.push({ name, updated_project_value: value });
-      }
-    });
+    if (value !== null) {
+      changes.push({ name, updated_project_value: value });
+    }
+  });
 
-    console.log("Updated Project Values:", changes);
-    alert("Valid changes captured in console. Backend integration pending.");
-  }
+  fetch('/update_table', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(changes)
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.status === 'success') {
+      alert('Changes saved!');
+    } else {
+      alert('Error saving changes.');
+    }
+  })
+  .catch(() => alert('Error saving changes.'));
+}
 
   // Validate on load
   window.onload = validateInputs;
