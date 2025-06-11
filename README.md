@@ -166,6 +166,6 @@ Or serve the static build using a tool like `serve`.
 
 ## License
 
-This project is proprietary and developed at Ergon Labs. Contact [Ergon Mobility](mailto:contact@ergonlabs.io) for usage permissions.
+This project is proprietary and developed at Ergon Labs. Contact [Ergon Mobility](mailto:ansh.malhotra@ergon-labs.com) for usage permissions.
 
 ---
