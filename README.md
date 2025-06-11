@@ -153,12 +153,6 @@ Or serve the static build using a tool like `serve`.
 
 ---
 
-## Screenshots *(Optional Section)*
-
-> Add UI images showing the CAN monitor, connection button, filters, editable table, and CSV download.
-
----
-
 ## Developer & Acknowledgments
 
 **Developed by:**  
