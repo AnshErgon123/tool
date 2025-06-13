@@ -145,6 +145,18 @@ Or serve the static build using a tool like `serve`.
 
 ---
 
+| Method | Endpoint            | Description                               |
+| ------ | ------------------- | ----------------------------------------- |
+| POST   | `/api/handshake`    | Initiates handshake with CAN client       |
+| POST   | `/api/request_data` | Requests data frame from CAN client       |
+| POST   | `/api/send_data`    | Receives CAN data and emits via WebSocket |
+| POST   | `/api/ack`          | ACK signal receiver and frontend notifier |
+| GET    | `/api/data_table`   | Retrieves static JSON data table          |
+| PUT    | `/api/data_table`   | Updates the static JSON data table        |
+| GET    | `/logs/download`    | Downloads logged CAN data as CSV          |
+
+---
+
 ## Security & Communication
 
 - The CAN client registers via a secure token (`SECRET_TOKEN`).
